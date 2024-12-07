@@ -1,0 +1,63 @@
+<audio id="audioPlay" controls></audio>
+<input type="file" id="fileInput">
+<script>const audioElement = document.getElementById("audioPlay");
+class AudioExporter {
+    constructor(audioData, sampleRate, channels) {
+        this.audioData = audioData;
+        this.sampleRate = sampleRate;
+        this.channels = channels;
+    }
+    convertToWav() {
+        const numChannels = this.channels, len = this.audioData.length;
+        const len2 = len * 2;
+        const buffer = new ArrayBuffer(44 + len2);
+        const view = new DataView(buffer);
+        this.writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + len2, true);
+        this.writeString(view, 8, 'WAVE');
+        this.writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, this.sampleRate, true);
+        view.setUint32(28, this.sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        this.writeString(view, 36, 'data');
+        view.setUint32(40, len2, true);
+        let offset = 44;
+        for (let i = 0; i < len; i++) {
+            view.setInt16(offset, this.audioData[i], true);
+            offset += 2;
+        }
+        return new Blob([view], { type: 'audio/wav' });
+    }
+    writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    }
+};
+
+let audioData, exporter;
+
+document.getElementById("fileInput").addEventListener('change', (event) => {
+    const file = event.target.files[0]; // Get the first file
+    if (file) {
+        const reader = new FileReader();
+        // When the file is successfully read (why does this sound like a meme?)
+        reader.onload = function(e) {
+            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized.")) >>> 0;
+            if (mode === 0) {
+                audioData = new Int16Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
+            }
+            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1);
+            if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
+            audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
+            alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
+        };
+        // Read the file as an ArrayBuffer
+        alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
+    }
+});
+</script>
