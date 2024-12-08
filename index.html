@@ -117,17 +117,17 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             }
             if (bit === 8) {
                 if (mode === 0) {
-                    audioData = Int8Array.from(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
+                    audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
                 }
             } else {
                 if (mode === 0) {
                     if (arrayBuffer.byteLength % 2 === 0) {
-                        audioData = Int16Array.from(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
+                        audioData = new Int16Array(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
                     } else {
                         // OH, NOES! WE RAN INTO A PROBLEM!
                         const uint8 = new Uint8Array(Math.ceil(arrayBuffer.byteLength / 2) * 2);
                         uint8.set(new Uint8Array(arrayBuffer));
-                        audioData = Int16Array.from(uint8.buffer);
+                        audioData = new Int16Array(uint8.buffer);
                     }
                 }
             }
