@@ -73,7 +73,7 @@ function update() {
         for (let y = 0; y < 16; y += 4) {
             const z = (destination + x + y * 64) * 2;
             const b = g[z];
-            rgba = "rgba(" + (b % 256) + "," + (b << 8) + "," + (g[z + 1] % 256) + "," + (g[z + 1] << 8) + ")";
+            rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + (g[z + 1] % 256) + "," + (g[z + 1] >> 8) + ")";
             s.fillStyle = rgba;
             s.fillRect(x * 16, y * 16, 16, 16);
         }
