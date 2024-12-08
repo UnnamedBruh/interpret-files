@@ -63,8 +63,6 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
     }
 });
 function update() {
-    s.fillStyle = "rgb(0,0,0)";
-    s.fillRect(0, 0, 256, 256);
     if (audioData && audioData.length !== 0) {
         const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
         let i = 0, rgba;
