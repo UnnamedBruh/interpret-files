@@ -100,7 +100,7 @@ function update(forceRedraw) {
             s.fillRect(0, 0, 256, 256);
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 6) * 6;
             s.beginPath();
-            for (let i = 0; i < 500; x += 5) {
+            for (let i = 0; i < 500; i += 5) {
                 s.moveTo(128, 128);
                 s.strokeStyle = "rgb(" + ((audioData[destination + i + 2] + bitmax) / divis) + "," + ((audioData[destination + i + 3] + bitmax) / divis) + "," + ((audioData[destination + i + 4] + bitmax) / divis) + ")";
                 s.lineTo(audioData[destination + i] / divis, audioData[destination + i + 1] / divis);
