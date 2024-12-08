@@ -2,75 +2,95 @@
 <input type="file" id="fileInput">
 <hr>
 <canvas width="256" height="256" id="visualizer"></canvas>
+
 <script>
-const audioPlayer = document.getElementById("audioPlay");
-const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d");
+  const audioPlayer = document.getElementById("audioPlay");
+  const canvas = document.getElementById("visualizer");
+  const s = canvas.getContext("2d");
 
-let audioContext, analyser, dataArray, bufferLength;
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 256; // Set the size of FFT (number of frequency bins)
 
-// Initialize Web Audio API and AnalyserNode
-function setupAudioContext() {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaElementSource(audioPlayer);
-    analyser = audioContext.createAnalyser();
+  let audioData = null;
+  let exporter;
 
-    // Connect analyser to the audio source and destination
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    analyser.fftSize = 256; // Determines data resolution
-    bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength); // Stores frequency data
-}
-
-// Visualizer: Grid-Based Visualization
-function drawVisualizer() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    analyser.getByteFrequencyData(dataArray); // Retrieve frequency data
-
-    const gridSize = 16; // Size of each grid cell
-    const cellSize = canvas.width / gridSize;
-
-    for (let x = 0; x < gridSize; x++) {
-        for (let y = 0; y < gridSize; y++) {
-            const index = (x + y * gridSize) % bufferLength; // Map grid cell to data index
-            const value = dataArray[index] / 255; // Normalize value (0 to 1)
-            
-            // Color mapping: Use a gradient or spectrum effect
-            const hue = Math.round(360 * value); // Map value to hue (0-360)
-            const brightness = Math.round(50 + value * 50); // Brightness range (50-100)
-            ctx.fillStyle = `hsl(${hue}, 100%, ${brightness}%)`;
-
-            // Draw the grid cell
-            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-        }
-    }
-
-    requestAnimationFrame(drawVisualizer); // Recursively call for smooth animation
-}
-
-// File input event listener
-document.getElementById("fileInput").addEventListener('change', (event) => {
+  // Handle file input
+  document.getElementById("fileInput").addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const arrayBuffer = e.target.result;
-
-            audioContext.resume(); // Resume audio context for playback
-            audioPlayer.src = URL.createObjectURL(new Blob([arrayBuffer]));
-            setupAudioContext(); // Setup Web Audio API after loading the file
-        };
-        reader.readAsArrayBuffer(file);
-    }
-});
-
-// Start visualizer when audio is played
-audioPlayer.addEventListener('play', () => {
-    if (!audioContext) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        const mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpreted as audio in the way it was organized.")) >>> 0;
+        if (mode === 0) {
+          audioData = new Int8Array(arrayBuffer);
+        }
+        exporter = new AudioExporter(audioData, Number(prompt("Enter the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1);
+        if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
+        audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
+        alert("The result may contain high-frequency data for variable audio.");
+        
+        // Start visualizer when audio is loaded
+        audioPlayer.play();
         setupAudioContext();
+      };
+      reader.readAsArrayBuffer(file);
     }
-    drawVisualizer();
-});
+  });
+
+  // Set up audio context and analyser
+  function setupAudioContext() {
+    const source = audioContext.createBufferSource();
+    fetch(audioPlayer.src)
+      .then(response => response.arrayBuffer())
+      .then(buffer => audioContext.decodeAudioData(buffer))
+      .then(decodedData => {
+        source.buffer = decodedData;
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        source.start(0);
+      });
+  }
+
+  // Update the visualizer every frame
+  function update() {
+    s.fillStyle = "rgba(0,0,0,1)";
+    s.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (audioData && audioData.length !== 0) {
+      // Create a buffer for the frequency data
+      const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(frequencyData);
+
+      // Visualize data as a grid of colors
+      const gridWidth = 16;
+      const gridHeight = 16;
+      const blockWidth = canvas.width / gridWidth;
+      const blockHeight = canvas.height / gridHeight;
+
+      for (let x = 0; x < gridWidth; x++) {
+        for (let y = 0; y < gridHeight; y++) {
+          const index = (y * gridWidth + x) * 2;
+          const colorValue = frequencyData[index % frequencyData.length];
+
+          // Generate a color based on the frequency value
+          const r = (colorValue % 256);
+          const g = (colorValue * 2) % 256;
+          const b = (colorValue * 3) % 256;
+          const alpha = 0.5 + Math.abs(Math.sin(colorValue / 255));
+
+          const rgba = `rgba(${r},${g},${b},${alpha})`;
+
+          s.fillStyle = rgba;
+          s.fillRect(x * blockWidth, y * blockHeight, blockWidth, blockHeight);
+        }
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  update(); // Start the visualization loop
+
 </script>
