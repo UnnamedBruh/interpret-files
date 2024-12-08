@@ -42,7 +42,7 @@ class AudioExporter {
     }
 };
 
-let audioData, exporter, bits, bitmax, divis;
+let audioData, exporter, bits, bitmax, divis, mini;
 
 document.getElementById("fileInput").addEventListener('change', (event) => {
     const file = event.target.files[0]; // Get the first file
@@ -77,7 +77,8 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
             bits = exporter.bits / 8;
             bitmax = exporter.bits === 8 ? 128 : 32768;
-            divis = exporter.bits === 8 ? 1 : 256
+            divis = exporter.bits === 8 ? 1 : 256;
+            mini = audioData.length - 4096;
         };
         // Read the file as an ArrayBuffer
         alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
@@ -86,6 +87,10 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
 function update() {
     if (audioData && audioData.length !== 0) {
         const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
+        if (destination > mini) {
+            s.fillStyle = "rgb(0,0,0)";
+            s.fillRect(0, 0, 256, 256);
+        }
         let i = 0, rgba;
         for (let x = 0; x < 64; x++) {
             for (let y = 0; y < 64; y++) {
