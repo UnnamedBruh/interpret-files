@@ -63,7 +63,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
     }
 });
 function update() {
-    s.fillStyle = "rgba(0,0,0,100)";
+    s.fillStyle = "rgba(0,0,0,1)";
     s.fillRect(0, 0, 256, 256);
     if (audioData && audioData.length !== 0) {
         const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
@@ -71,8 +71,8 @@ function update() {
         for (let x = 0; x < 16; x += 4) {
             for (let y = 0; y < 16; y += 4) {
                 const z = (destination + x + y * 64) * 2;
-                const b = audioData[z];
-                rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + (audioData[z + 1] % 256) + "," + (audioData[z + 1] >> 8) + ")";
+                const b = audioData[z] + 32768;
+                rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + ((audioData[z + 1] + 32768) % 256) + "," + ((audioData[z + 1] + 32768) / 65535) + ")";
                 s.fillStyle = rgba;
                 s.fillRect(x * 16, y * 16, 16, 16);
             }
