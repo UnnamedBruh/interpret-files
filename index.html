@@ -1,3 +1,5 @@
+<h1>Interpret Files</h1>
+<p>This GitHub project allows you to interpret any files you upload, including .BIN, .WAV, .PAK, .PNG, and more! However, beware that the visuals and the audio will be processed for you to look at, and listen to. <a style="color: red">MAKE SURE TO DISABLE THE VISUAL INTERPRETATION IF YOU ARE SENSITIVE TO FLASHING LIGHTS!</a> You can see the privacy policy <a href="privacy.html">here</a>.</p>
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput">
 <hr>
@@ -56,18 +58,18 @@ class AudioExporter {
 let audioData, exporter, bitmax, divis, shouldRedraw, point, prevDestination = 0;
 function update(forceRedraw) {
     if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
-        console.log("Redraw requested");
         if (choice.value === "Waterfall") {
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
-            let rgba;
+            let rgba, off, z, shou;
             for (let x = 0; x < 64; x++) {
                 for (let y = 0; y < 64; y++) {
-                    const z = destination + x * 3 + y * 64;
+                    off = x * 3 + y * 64;
+                    z = destination + off;
                     if (z >= audioData.length) {
                         s.fillStyle = "rgb(0,0,0)";
                         s.fillRect(x * 4, y * 4, 4, 4);
                     } else {
-                        const shou = prevDestination + x * 3 + y * 64;
+                        shou = prevDestination + off;
                         if (audioData[shou] !== audioData[z] || audioData[shou + 1] !== audioData[z + 1] || audioData[shou + 2] !== audioData[z + 2]) {
                             rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
                             s.fillStyle = rgba;
@@ -110,17 +112,17 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             }
             if (bit === 8) {
                 if (mode === 0) {
-                    audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
+                    audioData = Int8Array.from(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
                 }
             } else {
                 if (mode === 0) {
                     if (arrayBuffer.byteLength % 2 === 0) {
-                        audioData = new Int16Array(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
+                        audioData = Int16Array.from(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
                     } else {
                         // OH, NOES! WE RAN INTO A PROBLEM!
                         const uint8 = new Uint8Array(Math.ceil(arrayBuffer.byteLength / 2) * 2);
                         uint8.set(new Uint8Array(arrayBuffer));
-                        audioData = new Int16Array(uint8.buffer);
+                        audioData = Int16Array.from(uint8.buffer);
                     }
                 }
             }
