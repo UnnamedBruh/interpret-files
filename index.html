@@ -1,8 +1,11 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput">
 <hr>
+<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
+<p id="description"></p>
 <canvas width="256" height="256" id="visualizer">
 <script>const audioPlayer = document.getElementById("audioPlay"), s = document.getElementById("visualizer").getContext("2d");
+const options = [...document.querySelectorAll("option")], choice = document.getElementById("visualType"), desc = document.getElementById("description");
 class AudioExporter {
     constructor(audioData, sampleRate, channels, bits) {
         this.audioData = audioData;
@@ -84,25 +87,49 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
         alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
     }
 });
+s.strokeStyle = "rgb(255,255,255)";
+s.lineWidth = 1;
+s.lineCap = 'round';
+s.lineJoin = 'bevel';
 function update() {
     if (audioData && audioData.length !== 0) {
-        const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
-        let i = 0, rgba;
-        for (let x = 0; x < 64; x++) {
-            for (let y = 0; y < 64; y++) {
-                const z = destination + x * 3 + y * 64;
-                if (z > audioData.length) {
-                    s.fillStyle = "rgb(0,0,0)";
-                    s.fillRect(x * 4, y * 4, 4, 4);
-                } else {
-                    rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
-                    s.fillStyle = rgba;
-                    s.fillRect(x * 4, y * 4, 4, 4);
+        if (choice.value === "Waterfall") {
+            const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
+            let rgba;
+            for (let x = 0; x < 64; x++) {
+                for (let y = 0; y < 64; y++) {
+                    const z = destination + x * 3 + y * 64;
+                    if (z >= audioData.length) {
+                        s.fillStyle = "rgb(0,0,0)";
+                        s.fillRect(x * 4, y * 4, 4, 4);
+                    } else {
+                        rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
+                        s.fillStyle = rgba;
+                        s.fillRect(x * 4, y * 4, 4, 4);
+                    }
                 }
             }
+        } else if (choice.value === "Waveform") {
+            const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate);
+            s.beginPath();
+            s.moveTo(0, 128);
+            const ds = divis / 2;
+            for (let x = 0; x < 256; x++) {
+                s.lineTo(x, audioData[destination + x] + ds);
+            }
+            s.stroke();
         }
     }
     requestAnimationFrame(()=>update());
 }
 update();
+const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's volume."];
+for (let i = 0; i < options.length; i++) {
+    options[i].onmousehover = function() {
+        description.textContent = map[i];
+    }
+    options[i].onmouseleave = function() {
+        description.textContent = "";
+    }
+}
 </script>
