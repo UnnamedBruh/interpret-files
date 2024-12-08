@@ -104,8 +104,8 @@ function update(forceRedraw) {
                 s.moveTo(128, 128);
                 s.strokeStyle = "rgb(" + ((audioData[destination + i + 2] + bitmax) / divis) + "," + ((audioData[destination + i + 3] + bitmax) / divis) + "," + ((audioData[destination + i + 4] + bitmax) / divis) + ")";
                 s.lineTo(audioData[destination + i] / divis, audioData[destination + i + 1] / divis);
-                s.stroke();
             }
+            s.stroke();
         }
     }
     shouldRedraw = !audioPlayer.paused;
