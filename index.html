@@ -115,13 +115,14 @@ function update() {
             wa.width = 512;
             wa.height = 256;
             s.fillStyle = "rgb(0,0,0)";
-            s.fillRect(0, 0, 256, 256);
+            s.fillRect(0, 0, 512, 256);
             const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate);
             s.beginPath();
             s.moveTo(0, 128);
             for (let x = 0; x < 512; x++) {
                 s.lineTo(x, ((audioData[destination + x] + bitmax) / divis));
             }
+            s.fillStyle = "rgb(255,255,255)";
             s.stroke();
         }
     }
