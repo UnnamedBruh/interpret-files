@@ -3,7 +3,7 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput">
 <hr>
-<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
+<select id="visualType"><option>Waterfall</option><option>Waveform</option><option>Sketch</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
@@ -85,8 +85,6 @@ function update(forceRedraw) {
             }
             prevDestination = destination;
         } else if (choice.value === "Waveform") {
-            wa.width = 512;
-            wa.height = 256;
             s.fillStyle = "rgb(0,0,0)";
             s.fillRect(0, 0, 512, 256);
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
@@ -97,6 +95,17 @@ function update(forceRedraw) {
             }
             s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
+        } else if (choice.value === "Sketch") {
+            s.fillStyle = "rgb(0,0,0)";
+            s.fillRect(0, 0, 256, 256);
+            const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 6) * 6;
+            s.beginPath();
+            for (let i = 0; i < 500; x += 5) {
+                s.moveTo(128, 128);
+                s.strokeStyle = "rgb(" + ((audioData[destination + i + 2] + bitmax) / divis) + "," + ((audioData[destination + i + 3] + bitmax) / divis) + "," + ((audioData[destination + i + 4] + bitmax) / divis) + ")";
+                s.lineTo(audioData[destination + i] / divis, audioData[destination + i + 1] / divis);
+                s.stroke();
+            }
         }
     }
     shouldRedraw = !audioPlayer.paused;
@@ -157,7 +166,7 @@ for (let i = 0; i < options.length; i++) {
     }
 }
 choice.oninput = function() {
-    if (choice.value === "Waterfall") {
+    if (choice.value === "Waterfall" || choice.value === "Sketch") {
         wa.width = 256;
     } else if (choice.value === "Waveform") {
         wa.width = 512;
