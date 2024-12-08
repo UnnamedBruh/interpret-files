@@ -100,7 +100,7 @@ function update(forceRedraw) {
             let rgba, off, z, shou;
             for (let x = 0; x < 64; x++) {
                 for (let y = 0; y < 64; y++) {
-                    off = x * numRows + y;
+                    off = x * 64 + y;
                     z = destination + off;
                     if (z >= audioData.length) {
                         s.fillStyle = "rgb(0,0,0)";
