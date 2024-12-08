@@ -122,7 +122,7 @@ function update() {
             for (let x = 0; x < 512; x++) {
                 s.lineTo(x, ((audioData[destination + x] + bitmax) / divis));
             }
-            s.fillStyle = "rgb(255,255,255)";
+            s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
         }
     }
