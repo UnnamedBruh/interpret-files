@@ -53,7 +53,7 @@ class AudioExporter {
     }
 };
 
-let audioData, exporter, bitmax, divis, shouldRedraw, point;
+let audioData, exporter, bitmax, divis, shouldRedraw, point, prevDestination = 0;
 function update(forceRedraw) {
     if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
         console.log("Redraw requested");
@@ -69,12 +69,18 @@ function update(forceRedraw) {
                         s.fillStyle = "rgb(0,0,0)";
                         s.fillRect(x * 4, y * 4, 4, 4);
                     } else {
-                        rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
-                        s.fillStyle = rgba;
-                        s.fillRect(x * 4, y * 4, 4, 4);
+                        const shou = prevDestination + x * 3 + y * 64;
+                        if (audioData[shou] !== audioData[z] || audioData[shou + 1] !== audioData[z + 1] || audioData[shou + 2] !== audioData[z + 2]) {
+                            rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
+                            s.fillStyle = rgba;
+                            s.fillRect(x * 4, y * 4, 4, 4);
+                        } else {
+                            console.log("No redrawing for this pixel required");
+                        }
                     }
                 }
             }
+            prevDestination = destination;
         } else if (choice.value === "Waveform") {
             wa.width = 512;
             wa.height = 256;
