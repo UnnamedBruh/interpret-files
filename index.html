@@ -64,7 +64,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
 });
 function update() {
     if (audioData && audioData.length !== 0) {
-        const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
+        const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
         let i = 0, rgba;
         for (let x = 0; x < 64; x++) {
             for (let y = 0; y < 64; y++) {
