@@ -1,6 +1,8 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput">
-<script>const audioPlayer = document.getElementById("audioPlay");
+<hr>
+<canvas width="256" height="256" id="visualizer">
+<script>const audioPlayer = document.getElementById("audioPlay"), s = document.getElementById("visualizer");
 class AudioExporter {
     constructor(audioData, sampleRate, channels) {
         this.audioData = audioData;
@@ -60,4 +62,23 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
         alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
     }
 });
+const g = exporter.audioData;
+function update() {
+    s.fillStyle = "rgba(0,0,0,100)";
+    s.fillRect(0, 0, 256, 256);
+    if (!exporter) return;
+    const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
+    let i = 0, rgba;
+    for (let x = 0; x < 16; x += 4) {
+        for (let y = 0; y < 16; y += 4) {
+            const z = (destination + x + y * 64) * 2;
+            const b = g[z];
+            rgba = "rgba(" + (b % 256) + "," + (b << 8) + "," + (g[z + 1] % 256) + "," + (g[z + 1] << 8) + ")";
+            s.fillStyle = rgba;
+            s.fillRect(x * 16, y * 16, 16, 16);
+        }
+    }
+    requestAnimationFrame(update);
+}
+update();
 </script>
