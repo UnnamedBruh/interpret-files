@@ -45,7 +45,7 @@ class AudioExporter {
     }
 };
 
-let audioData, exporter, bits, bitmax, divis, mini;
+let audioData, exporter, bits, bitmax, divis;
 
 document.getElementById("fileInput").addEventListener('change', (event) => {
     const file = event.target.files[0]; // Get the first file
@@ -81,7 +81,6 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             bits = exporter.bits / 8;
             bitmax = exporter.bits === 8 ? 128 : 32768;
             divis = exporter.bits === 8 ? 1 : 256;
-            mini = audioData.length - 262144;
         };
         // Read the file as an ArrayBuffer
         alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
@@ -110,12 +109,13 @@ function update() {
                 }
             }
         } else if (choice.value === "Waveform") {
+            s.fillStyle = "rgb(0,0,0)";
+            s.fillRect(0, 0, 256, 256);
             const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate);
             s.beginPath();
             s.moveTo(0, 128);
-            const ds = divis / 2;
             for (let x = 0; x < 256; x++) {
-                s.lineTo(x, audioData[destination + x] + ds);
+                s.lineTo(x, ((audioData[destination + x] + bitmax) / divis));
             }
             s.stroke();
         }
