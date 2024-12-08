@@ -5,8 +5,9 @@
 <hr>
 <select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
 <p id="description"></p>
+Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
-<script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer");
+<script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer"), ddd = document.getElementById("shouldDisplay");
 const s = wa.getContext("2d");
 const options = [...document.querySelectorAll("option")], choice = document.getElementById("visualType"), desc = document.getElementById("description");
 class AudioExporter {
@@ -55,9 +56,13 @@ class AudioExporter {
     }
 };
 
+ddd.oninput = function() {
+    wa.style.display = ddd.checked ? "" : "none";
+}
+
 let audioData, exporter, bitmax, divis, shouldRedraw, point, prevDestination = 0;
 function update(forceRedraw) {
-    if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
+    if (ddd.checked && audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
         if (choice.value === "Waterfall") {
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
             let rgba, off, z, shou;
