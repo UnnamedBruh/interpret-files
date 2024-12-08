@@ -78,7 +78,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             bits = exporter.bits / 8;
             bitmax = exporter.bits === 8 ? 128 : 32768;
             divis = exporter.bits === 8 ? 1 : 256;
-            mini = audioData.length - 65536;
+            mini = audioData.length - 262144;
         };
         // Read the file as an ArrayBuffer
         alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
