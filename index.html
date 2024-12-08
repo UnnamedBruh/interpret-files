@@ -53,9 +53,10 @@ class AudioExporter {
     }
 };
 
-let audioData, exporter, bitmax, divis, shouldRedraw;
+let audioData, exporter, bitmax, divis, shouldRedraw, point;
 function update(forceRedraw) {
-    if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw)) {
+    if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
+        console.log("Redraw requested");
         if (choice.value === "Waterfall") {
             wa.width = 256;
             wa.height = 256;
@@ -90,6 +91,7 @@ function update(forceRedraw) {
         }
     }
     shouldRedraw = !audioPlayer.paused;
+    point = audioPlayer.currentTime;
     if (!forceRedraw) requestAnimationFrame(()=>update());
 }
 update();
