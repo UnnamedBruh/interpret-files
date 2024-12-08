@@ -3,7 +3,7 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput" multiple>
 <hr>
-<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
+<select id="visualType"><option>Waterfall</option><option>Waveform</option><option>Waterfall (Column-based)</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
@@ -95,7 +95,7 @@ function update(forceRedraw) {
             }
             s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
-        } else if (choice.value === "Waterfall (Column-Based)") {
+        } else if (choice.value === "Waterfall (Column-based)") {
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
             let rgba, off, z, shou;
             for (let x = 0; x < 64; x++) {
@@ -175,7 +175,7 @@ for (let i = 0; i < options.length; i++) {
     }
 }
 choice.oninput = function() {
-    if (choice.value === "Waterfall" || choice.value === "Sketch") {
+    if (choice.value === "Waterfall" || choice.value === "Waterfall (Column-based)") {
         wa.width = 256;
     } else if (choice.value === "Waveform") {
         wa.width = 512;
