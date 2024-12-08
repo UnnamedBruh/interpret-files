@@ -2,7 +2,7 @@
 <input type="file" id="fileInput">
 <hr>
 <canvas width="256" height="256" id="visualizer">
-<script>const audioPlayer = document.getElementById("audioPlay"), s = document.getElementById("visualizer");
+<script>const audioPlayer = document.getElementById("audioPlay"), s = document.getElementById("visualizer").getContext("2d");
 class AudioExporter {
     constructor(audioData, sampleRate, channels) {
         this.audioData = audioData;
