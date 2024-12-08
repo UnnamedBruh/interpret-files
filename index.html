@@ -74,8 +74,6 @@ function update(forceRedraw) {
                             rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
                             s.fillStyle = rgba;
                             s.fillRect(x * 4, y * 4, 4, 4);
-                        } else {
-                            console.log("No redrawing for this pixel required");
                         }
                     }
                 }
