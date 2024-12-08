@@ -68,13 +68,13 @@ function update() {
     if (audioData && audioData.length !== 0) {
         const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
         let i = 0, rgba;
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 32; x++) {
+            for (let y = 0; y < 32; y++) {
                 const z = destination + x * 3 + y * 64;
                 const b = audioData[z];
                 rgba = "rgb(" + audioData[z] + "," + audioData[z + 1] + "," + audioData[z + 2] + ")";
                 s.fillStyle = rgba;
-                s.fillRect(x * 16, y * 16, 16, 16);
+                s.fillRect(x * 8, y * 8, 8, 8);
             }
         }
     }
