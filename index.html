@@ -1,9 +1,9 @@
 <h1>Interpret Files</h1>
 <p>This GitHub project allows you to interpret any files you upload, including .BIN, .WAV, .PAK, .PNG, and more! However, beware that the visuals and the audio will be processed for you to look at, and listen to. <a style="color: red">MAKE SURE TO DISABLE THE VISUAL INTERPRETATION IF YOU ARE SENSITIVE TO FLASHING LIGHTS!</a> You can see the privacy policy <a href="privacy.html">here</a>.</p>
 <audio id="audioPlay" controls></audio>
-<input type="file" id="fileInput">
+<input type="file" id="fileInput" multiple>
 <hr>
-<select id="visualType"><option>Waterfall</option><option>Waveform</option><option>Sketch</option></select>
+<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
@@ -95,18 +95,27 @@ function update(forceRedraw) {
             }
             s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
-        } else if (choice.value === "Sketch") {
-            s.fillStyle = "rgb(0,0,0)";
-            s.fillRect(0, 0, 256, 256);
-            const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 6) * 6;
-            s.beginPath();
-            for (let i = 0; i < 500; i += 5) {
-                s.moveTo(128, 128);
-                s.strokeStyle = "rgb(" + ((audioData[destination + i + 2] + bitmax) * 2 / divis) + "," + ((audioData[destination + i + 3] + bitmax) * 2 / divis) + "," + ((audioData[destination + i + 4] + bitmax) * 2 / divis) + ")";
-                s.lineTo(audioData[destination + i] / divis, audioData[destination + i + 1] / divis);
-                s.stroke();
+        } else if (choice.value === "Waterfall (Column-Based)") {
+            const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
+            let rgba, off, z, shou;
+            for (let x = 0; x < 64; x++) {
+                for (let y = 0; y < 64; y++) {
+                    off = x * numRows + y;
+                    z = destination + off;
+                    if (z >= audioData.length) {
+                        s.fillStyle = "rgb(0,0,0)";
+                        s.fillRect(x * 4, y * 4, 4, 4);
+                     } else {
+                        shou = prevDestination + off;
+                        if (audioData[shou] !== audioData[z] || audioData[shou + 1] !== audioData[z + 1] || audioData[shou + 2] !== audioData[z + 2]) {
+                            rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
+                            s.fillStyle = rgba;
+                            s.fillRect(x * 4, y * 4, 4, 4);
+                        }
+                    }
+                }
             }
-        }
+            prevDestination = destination;
     }
     shouldRedraw = !audioPlayer.paused;
     point = audioPlayer.currentTime;
@@ -114,8 +123,8 @@ function update(forceRedraw) {
 }
 update();
 document.getElementById("fileInput").addEventListener('change', (event) => {
-    const file = event.target.files[0]; // Get the first file
-    if (file) {
+    if (event.target.files.length === 1) {
+        const file = event.target.files[0];
         const reader = new FileReader();
         // When the file is successfully read (why does this sound like a meme?)
         reader.onload = function(e) {
