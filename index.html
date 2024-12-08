@@ -4,7 +4,8 @@
 <select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
 <p id="description"></p>
 <canvas width="256" height="256" id="visualizer">
-<script>const audioPlayer = document.getElementById("audioPlay"), s = document.getElementById("visualizer").getContext("2d");
+<script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer");
+const s = wa.getContext("2d");
 const options = [...document.querySelectorAll("option")], choice = document.getElementById("visualType"), desc = document.getElementById("description");
 class AudioExporter {
     constructor(audioData, sampleRate, channels, bits) {
@@ -93,6 +94,8 @@ s.lineJoin = 'bevel';
 function update() {
     if (audioData && audioData.length !== 0) {
         if (choice.value === "Waterfall") {
+            wa.width = 256;
+            wa.height = 256;
             const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
             let rgba;
             for (let x = 0; x < 64; x++) {
@@ -109,12 +112,14 @@ function update() {
                 }
             }
         } else if (choice.value === "Waveform") {
+            wa.width = 512;
+            wa.height = 256;
             s.fillStyle = "rgb(0,0,0)";
             s.fillRect(0, 0, 256, 256);
             const destination = Math.round(bits * audioPlayer.currentTime * exporter.sampleRate);
             s.beginPath();
             s.moveTo(0, 128);
-            for (let x = 0; x < 256; x++) {
+            for (let x = 0; x < 512; x++) {
                 s.lineTo(x, ((audioData[destination + x] + bitmax) / divis));
             }
             s.stroke();
