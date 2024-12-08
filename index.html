@@ -97,8 +97,9 @@ s.strokeStyle = "rgb(255,255,255)";
 s.lineWidth = 1;
 s.lineCap = 'round';
 s.lineJoin = 'bevel';
+let shouldRedraw = false;
 function update() {
-    if (audioData && audioData.length !== 0) {
+    if (audioData && audioData.length !== 0 && shouldRedraw) {
         if (choice.value === "Waterfall") {
             wa.width = 256;
             wa.height = 256;
@@ -132,6 +133,7 @@ function update() {
             s.stroke();
         }
     }
+    shouldRedraw = !audioPlayer.paused;
     requestAnimationFrame(()=>update());
 }
 update();
