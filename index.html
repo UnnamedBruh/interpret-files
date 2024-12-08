@@ -53,6 +53,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
             const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
             if (bit !== 8 && bit !== 16) {
                 alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
+                bit = 8;
             }
             if (bit === 8) {
                 if (mode === 0) {
@@ -70,7 +71,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     }
                 }
             }
-            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1);
+            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1, bit);
             if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
             audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
             alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
