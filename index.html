@@ -70,9 +70,9 @@ function update() {
         let i = 0, rgba;
         for (let x = 0; x < 16; x += 4) {
             for (let y = 0; y < 16; y += 4) {
-                    const z = (destination + x + y * 64) * 2;
+                const z = (destination + x + y * 64) * 2;
                 const b = audioData[z];
-                rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + (g[z + 1] % 256) + "," + (g[z + 1] >> 8) + ")";
+                rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + (audioData[z + 1] % 256) + "," + (audioData[z + 1] >> 8) + ")";
                 s.fillStyle = rgba;
                 s.fillRect(x * 16, y * 16, 16, 16);
             }
