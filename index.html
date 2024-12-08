@@ -58,8 +58,6 @@ function update(forceRedraw) {
     if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
         console.log("Redraw requested");
         if (choice.value === "Waterfall") {
-            wa.width = 256;
-            wa.height = 256;
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
             let rgba;
             for (let x = 0; x < 64; x++) {
@@ -150,5 +148,13 @@ for (let i = 0; i < options.length; i++) {
     options[i].onmouseout = function() {
         description.textContent = "";
     }
+}
+choice.oninput = function() {
+    if (choice.value === "Waterfall") {
+        wa.width = 256;
+    } else if (choice.value === "Waveform") {
+        wa.width = 512;
+    }
+    wa.height = 256;
 }
 </script>
