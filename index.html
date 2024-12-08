@@ -53,53 +53,9 @@ class AudioExporter {
     }
 };
 
-let audioData, exporter, bitmax, divis;
-
-document.getElementById("fileInput").addEventListener('change', (event) => {
-    const file = event.target.files[0]; // Get the first file
-    if (file) {
-        const reader = new FileReader();
-        // When the file is successfully read (why does this sound like a meme?)
-        reader.onload = function(e) {
-            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
-            if (bit !== 8 && bit !== 16) {
-                alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
-                bit = 8;
-            }
-            if (bit === 8) {
-                if (mode === 0) {
-                    audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
-                }
-            } else {
-                if (mode === 0) {
-                    if (arrayBuffer.byteLength % 2 === 0) {
-                        audioData = new Int16Array(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
-                    } else {
-                        // OH, NOES! WE RAN INTO A PROBLEM!
-                        const uint8 = new Uint8Array(Math.ceil(arrayBuffer.byteLength / 2) * 2);
-                        uint8.set(new Uint8Array(arrayBuffer));
-                        audioData = new Int16Array(uint8.buffer);
-                    }
-                }
-            }
-            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1, bit);
-            if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
-            audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
-            alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
-            bitmax = exporter.bits === 8 ? 128 : 32768;
-            divis = exporter.bits === 8 ? 1 : 256;
-        };
-        // Read the file as an ArrayBuffer
-        alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
-    }
-});
-s.strokeStyle = "rgb(255,255,255)";
-s.lineWidth = 1;
-s.lineCap = 'round';
-s.lineJoin = 'bevel';
-let shouldRedraw = false;
-function update() {
-    if (audioData && audioData.length !== 0 && shouldRedraw) {
+let audioData, exporter, bitmax, divis, shouldRedraw;
+function update(forceRedraw) {
+    if (audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw)) {
         if (choice.value === "Waterfall") {
             wa.width = 256;
             wa.height = 256;
@@ -134,9 +90,52 @@ function update() {
         }
     }
     shouldRedraw = !audioPlayer.paused;
-    requestAnimationFrame(()=>update());
+    if (!forceRedraw) requestAnimationFrame(()=>update());
 }
 update();
+document.getElementById("fileInput").addEventListener('change', (event) => {
+    const file = event.target.files[0]; // Get the first file
+    if (file) {
+        const reader = new FileReader();
+        // When the file is successfully read (why does this sound like a meme?)
+        reader.onload = function(e) {
+            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
+            if (bit !== 8 && bit !== 16) {
+                alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
+                bit = 8;
+            }
+            if (bit === 8) {
+                if (mode === 0) {
+                    audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
+                }
+            } else {
+                if (mode === 0) {
+                    if (arrayBuffer.byteLength % 2 === 0) {
+                        audioData = new Int16Array(arrayBuffer); // I wonder what this sounds like when I interpret 16-bit WAV sounds... oh, they sound the same.
+                    } else {
+                        // OH, NOES! WE RAN INTO A PROBLEM!
+                        const uint8 = new Uint8Array(Math.ceil(arrayBuffer.byteLength / 2) * 2);
+                        uint8.set(new Uint8Array(arrayBuffer));
+                        audioData = new Int16Array(uint8.buffer);
+                    }
+                }
+            }
+            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1, bit);
+            if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
+            audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
+            alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
+            bitmax = exporter.bits === 8 ? 128 : 32768;
+            divis = exporter.bits === 8 ? 1 : 256;
+            update(true);
+        };
+        // Read the file as an ArrayBuffer
+        alert("The file has been uploaded to the tool (not sent to the internet). Pressing OK may begin the reading process."), reader.readAsArrayBuffer(file);
+    }
+});
+s.strokeStyle = "rgb(255,255,255)";
+s.lineWidth = 1;
+s.lineCap = 'round';
+s.lineJoin = 'bevel';
 const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's volume."];
 for (let i = 0; i < options.length; i++) {
     options[i].onmouseover = function() {
