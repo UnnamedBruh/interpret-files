@@ -3,7 +3,7 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput" multiple>
 <hr>
-<select id="visualType"><option>Waterfall</option><option>Waveform</option><option>Waterfall (Column-based)</option></select>
+<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
@@ -95,27 +95,6 @@ function update(forceRedraw) {
             }
             s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
-        } else if (choice.value === "Waterfall (Column-based)") {
-            const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
-            let rgba, off, z, shou;
-            for (let x = 0; x < 64; x++) {
-                for (let y = 0; y < 64; y++) {
-                    off = x * 64 + y;
-                    z = destination + off;
-                    if (z >= audioData.length) {
-                        s.fillStyle = "rgb(0,0,0)";
-                        s.fillRect(x * 4, y * 4, 4, 4);
-                     } else {
-                        shou = prevDestination + off;
-                        if (audioData[shou] !== audioData[z] || audioData[shou + 1] !== audioData[z + 1] || audioData[shou + 2] !== audioData[z + 2]) {
-                            rgba = "rgb(" + ((audioData[z] + bitmax) / divis) + "," + ((audioData[z + 1] + bitmax) / divis) + "," + ((audioData[z + 2] + bitmax) / divis) + ")";
-                            s.fillStyle = rgba;
-                            s.fillRect(x * 4, y * 4, 4, 4);
-                        }
-                    }
-                }
-            }
-            prevDestination = destination;
         }
     }
     shouldRedraw = !audioPlayer.paused;
@@ -176,7 +155,7 @@ for (let i = 0; i < options.length; i++) {
     }
 }
 choice.oninput = function() {
-    if (choice.value === "Waterfall" || choice.value === "Waterfall (Column-based)") {
+    if (choice.value === "Waterfall") {
         wa.width = 256;
     } else if (choice.value === "Waveform") {
         wa.width = 512;
