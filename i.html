@@ -1,0 +1,76 @@
+<audio id="audioPlay" controls></audio>
+<input type="file" id="fileInput">
+<hr>
+<canvas width="256" height="256" id="visualizer"></canvas>
+<script>
+const audioPlayer = document.getElementById("audioPlay");
+const canvas = document.getElementById("visualizer");
+const ctx = canvas.getContext("2d");
+
+let audioContext, analyser, dataArray, bufferLength;
+
+// Initialize Web Audio API and AnalyserNode
+function setupAudioContext() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaElementSource(audioPlayer);
+    analyser = audioContext.createAnalyser();
+
+    // Connect analyser to the audio source and destination
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    analyser.fftSize = 256; // Determines data resolution
+    bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength); // Stores frequency data
+}
+
+// Visualizer: Grid-Based Visualization
+function drawVisualizer() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    analyser.getByteFrequencyData(dataArray); // Retrieve frequency data
+
+    const gridSize = 16; // Size of each grid cell
+    const cellSize = canvas.width / gridSize;
+
+    for (let x = 0; x < gridSize; x++) {
+        for (let y = 0; y < gridSize; y++) {
+            const index = (x + y * gridSize) % bufferLength; // Map grid cell to data index
+            const value = dataArray[index] / 255; // Normalize value (0 to 1)
+            
+            // Color mapping: Use a gradient or spectrum effect
+            const hue = Math.round(360 * value); // Map value to hue (0-360)
+            const brightness = Math.round(50 + value * 50); // Brightness range (50-100)
+            ctx.fillStyle = `hsl(${hue}, 100%, ${brightness}%)`;
+
+            // Draw the grid cell
+            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+        }
+    }
+
+    requestAnimationFrame(drawVisualizer); // Recursively call for smooth animation
+}
+
+// File input event listener
+document.getElementById("fileInput").addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const arrayBuffer = e.target.result;
+
+            audioContext.resume(); // Resume audio context for playback
+            audioPlayer.src = URL.createObjectURL(new Blob([arrayBuffer]));
+            setupAudioContext(); // Setup Web Audio API after loading the file
+        };
+        reader.readAsArrayBuffer(file);
+    }
+});
+
+// Start visualizer when audio is played
+audioPlayer.addEventListener('play', () => {
+    if (!audioContext) {
+        setupAudioContext();
+    }
+    drawVisualizer();
+});
+</script>
