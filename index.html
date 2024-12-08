@@ -70,7 +70,7 @@ function update() {
         let i = 0, rgba;
         for (let x = 0; x < 16; x++) {
             for (let y = 0; y < 16; y++) {
-                const z = (destination + x + y * 64) * 2;
+                const z = destination + x + y * 64;
                 const b = audioData[z] + 32768;
                 rgba = "rgba(" + (b % 256) + "," + (b >> 8) + "," + ((audioData[z + 1] + 32768) % 256) + "," + ((audioData[z + 1] + 32768) / 65535) + ")";
                 s.fillStyle = rgba;
