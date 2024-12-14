@@ -119,7 +119,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
                 } else if (mode === 1) {
                     audioData = new Int8Array(arrayBuffer.byteLength);
-                    for (let i = 0; i < audioData.byteLength; i++) {
+                    for (let i = 0; i < audioData.length; i++) {
                         audioData[i] = arrayBuffer[i] - ne;
                     }
                 }
