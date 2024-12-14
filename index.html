@@ -118,9 +118,10 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                 if (mode === 0) {
                     audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
                 } else if (mode === 1) {
-                    audioData = new Int8Array(arrayBuffer.byteLength);
+                    audioData = new Int8Array(audioData.length);
+                    const arr = new Uint8Array(audioData);
                     for (let i = 0; i < audioData.length; i++) {
-                        audioData[i] = arrayBuffer[i] - ne;
+                        audioData[i] = arr[i] - ne;
                     }
                 }
             } else {
@@ -135,12 +136,13 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     }
                 } else if (mode === 1) {
                     audioData = new Int16Array(arrayBuffer.byteLength / 2);
+                    const arr = new Uint8Array(audioData);
                     const len = Math.ceil(arrayBuffer.byteLength / 4) * 2, len2 = Math.ceil(arrayBuffer.byteLength / 4) * 2;
                     for (let i = 0; i < len2; i++) {
-                        audioData[i] = (256 * arrayBuffer[i << 1] + arrayBuffer[(i << 1) + 1]) - ne;
+                        audioData[i] = (256 * arr[i << 1] + arr[(i << 1) + 1]) - ne;
                     }
                     for (let i = 0; i < len; i++) {
-                        audioData[i] = 256 * arrayBuffer[i << 1] - ne;
+                        audioData[i] = 256 * arr[i << 1] - ne;
                     }
                 }
             }
