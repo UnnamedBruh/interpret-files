@@ -136,7 +136,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     }
                 } else if (mode === 1) {
                     audioData = new Int16Array(arrayBuffer.byteLength / 2);
-                    const arr = new Uint8Array(audioData);
+                    const arr = new Uint8Array(arrayBuffer);
                     const len = Math.ceil(arrayBuffer.byteLength / 4) * 2, len2 = Math.ceil(arrayBuffer.byteLength / 4) * 2;
                     for (let i = 0; i < len2; i++) {
                         audioData[i] = (256 * arr[i << 1] + arr[(i << 1) + 1]) - ne;
