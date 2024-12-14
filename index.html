@@ -108,14 +108,20 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
         const reader = new FileReader();
         // When the file is successfully read (why does this sound like a meme?)
         reader.onload = function(e) {
-            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
+            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized. 1 = emulated interpretation: file data is interpreted as audio using the formula to mimick normal interpretation.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
             if (bit !== 8 && bit !== 16) {
                 alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
                 bit = 8;
             }
+            const ne = Math.pow(2, bit) >> 1;
             if (bit === 8) {
                 if (mode === 0) {
                     audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
+                } else if (mode === 1) {
+                    audioData = new Int8Array(arrayBuffer.byteLength);
+                    for (let i = 0; i < audioData.byteLength; i++) {
+                        audioData[i] = arrayBuffer[i] - ne;
+                    }
                 }
             } else {
                 if (mode === 0) {
@@ -126,6 +132,15 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                         const uint8 = new Uint8Array(Math.ceil(arrayBuffer.byteLength / 2) * 2);
                         uint8.set(new Uint8Array(arrayBuffer));
                         audioData = new Int16Array(uint8.buffer);
+                    }
+                } else if (mode === 1) {
+                    audioData = new Int16Array(arrayBuffer.byteLength >> 1);
+                    const len = Math.ceil(arrayBuffer.byteLength >> 1), len2 = Math.ceil(arrayBuffer.byteLength >> 1);
+                    for (let i = 0; i < len2; i++) {
+                        audioData[i] = (arrayBuffer[i << 1] + arrayBuffer[(i << 1) + 1]) - ne;
+                    }
+                    for (let i = 0; i < len; i++) {
+                        audioData[i] = 256 * arrayBuffer[i << 1] - ne;
                     }
                 }
             }
