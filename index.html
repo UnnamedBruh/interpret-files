@@ -113,7 +113,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                 alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
                 bit = 8;
             }
-            const ne = Math.pow(2, bit) >> 1;
+            const ne = Math.pow(2, bit) / 2;
             if (bit === 8) {
                 if (mode === 0) {
                     audioData = new Int8Array(arrayBuffer); // LOOK, MOM!! I OPTIMIZED MY DATA INTERPRETATION STEPS!!! ISNT THAT COOL????
@@ -134,10 +134,10 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                         audioData = new Int16Array(uint8.buffer);
                     }
                 } else if (mode === 1) {
-                    audioData = new Int16Array(arrayBuffer.byteLength >> 1);
-                    const len = Math.ceil(arrayBuffer.byteLength >> 1), len2 = Math.ceil(arrayBuffer.byteLength >> 1);
+                    audioData = new Int16Array(arrayBuffer.byteLength / 2);
+                    const len = Math.ceil(arrayBuffer.byteLength / 4) * 2, len2 = Math.ceil(arrayBuffer.byteLength / 4) * 2;
                     for (let i = 0; i < len2; i++) {
-                        audioData[i] = (arrayBuffer[i << 1] + arrayBuffer[(i << 1) + 1]) - ne;
+                        audioData[i] = (256 * arrayBuffer[i << 1] + arrayBuffer[(i << 1) + 1]) - ne;
                     }
                     for (let i = 0; i < len; i++) {
                         audioData[i] = 256 * arrayBuffer[i << 1] - ne;
