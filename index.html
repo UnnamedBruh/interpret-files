@@ -108,7 +108,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
         const reader = new FileReader();
         // When the file is successfully read (why does this sound like a meme?)
         reader.onload = function(e) {
-            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized. 1 = emulated interpretation: file data is interpreted as audio using the formula to mimick normal interpretation.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
+            const arrayBuffer = e.target.result, mode = parseFloat(prompt("What mode should be used for the interpretation process? 0 = basic interpretation: file data is interpeted as audio in the way it was organized. 1 = emulated interpretation: file data is interpreted as audio using the formula to mimick the basic interpretation.")) >>> 0, bit = parseFloat(prompt("How many bits should each sample accept? (Default is 8 bits each)") || "8") >>> 0;
             if (bit !== 8 && bit !== 16) {
                 alert("The amount of bits should be either 8 or 16. Defaulting to 8 bits instead.");
                 bit = 8;
@@ -139,10 +139,10 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     const arr = new Uint8Array(arrayBuffer);
                     const len = Math.ceil(arrayBuffer.byteLength / 4) * 2, len2 = Math.ceil(arrayBuffer.byteLength / 4) * 2;
                     for (let i = 0; i < len2; i++) {
-                        audioData[i] = (256 * arr[i << 1] + arr[(i << 1) + 1]) - ne;
+                        audioData[i] = (arr[i << 1] + 256 * arr[(i << 1) + 1]) - ne;
                     }
                     for (let i = 0; i < len; i++) {
-                        audioData[i] = 256 * arr[i << 1] - ne;
+                        audioData[i] = arr[i << 1] - ne;
                     }
                 }
             }
