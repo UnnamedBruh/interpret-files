@@ -3,7 +3,7 @@
 <audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput" multiple>
 <hr>
-<select id="visualType"><option>Waterfall</option><option>Waveform</option></select>
+<select id="visualType"><option value="a">Waterfall</option><option value="w">Waveform</option><option value="d">Sketch</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer">
@@ -63,7 +63,7 @@ ddd.oninput = function() {
 let audioData, exporter, bitmax, divis, shouldRedraw, point, prevDestination = 0;
 function update(forceRedraw) {
     if (ddd.checked && audioData && audioData.length !== 0 && (shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) {
-        if (choice.value === "Waterfall") {
+        if (choice.value === "a") {
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate / 64) * 64;
             let rgba, off, z, shou;
             for (let x = 0; x < 64; x++) {
@@ -84,14 +84,27 @@ function update(forceRedraw) {
                 }
             }
             prevDestination = destination;
-        } else if (choice.value === "Waveform") {
+        } else if (choice.value === "w") {
+            s.lineWidth = 2;
             s.fillStyle = "rgb(0,0,0)";
             s.fillRect(0, 0, 512, 256);
             const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
             s.beginPath();
             s.moveTo(0, 128);
             for (let x = 0; x < 512; x++) {
-                s.lineTo(x, ((audioData[destination + x] + bitmax) / divis));
+                s.lineTo(x, (audioData[destination + x] + bitmax) / divis);
+            }
+            s.strokeStyle = "rgb(255,255,255)";
+            s.stroke();
+        } else {
+            s.lineWidth = 2;
+            s.fillStyle = "rgb(0,0,0)";
+            s.fillRect(0, 0, 512, 256);
+            const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate);
+            s.beginPath();
+            for (let x = 0; x < 512; x += 2) {
+                let rrd = destination + x;
+                s.lineTo((audioData[rrd] + bitmax) / divis, (audioData[rrd + 1] + bitmax) / divis);
             }
             s.strokeStyle = "rgb(255,255,255)";
             s.stroke();
@@ -162,7 +175,7 @@ s.strokeStyle = "rgb(255,255,255)";
 s.lineWidth = 1;
 s.lineCap = 'round';
 s.lineJoin = 'bevel';
-const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's volume."];
+const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's sample values.", "Uses a white line which isn't fixed"];
 for (let i = 0; i < options.length; i++) {
     options[i].onmouseover = function() {
         description.textContent = map[i];
@@ -172,9 +185,9 @@ for (let i = 0; i < options.length; i++) {
     }
 }
 choice.oninput = function() {
-    if (choice.value === "Waterfall") {
+    if (choice.value === "a" || choice.value === "d") {
         wa.width = 256;
-    } else if (choice.value === "Waveform") {
+    } else if (choice.value === "w") {
         wa.width = 512;
     }
     wa.height = 256;
