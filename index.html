@@ -159,7 +159,7 @@ document.getElementById("fileInput").addEventListener('change', (event) => {
                     }
                 }
             }
-            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), 1, bit);
+            exporter = new AudioExporter(audioData, Number(prompt("Enter in the sample rate of the audio (48000 will be the default if invalid input, or input not received).") || 48000), Number(prompt("Enter in the channels of the audio (1 will be the default if invalid input, or input not received).") || 1), bit);
             if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
             audioPlayer.src = URL.createObjectURL(exporter.convertToWav());
             alert("WARNING: THE RESULT OF THE AUDIO MAY CONTAIN VERY HIGH FREQUENCIES FOR DATA THAT MAY VARY A LOT!");
