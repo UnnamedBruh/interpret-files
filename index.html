@@ -30,8 +30,8 @@ class AudioExporter {
         view.setUint16(20, 1, true);
         view.setUint16(22, numChannels, true);
         view.setUint32(24, this.sampleRate, true);
-        view.setUint32(28, this.sampleRate * 2, true);
-        view.setUint16(32, 2, true);
+        view.setUint32(28, this.sampleRate * this.channels * (this.bits / 8), true);
+        view.setUint16(32, this.channels * (this.bits / 8), true);
         view.setUint16(34, this.bits, true);
         this.writeString(view, 36, 'data');
         view.setUint32(40, len2, true);
