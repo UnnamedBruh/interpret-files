@@ -230,17 +230,20 @@ const combinedStream = new MediaStream([
 document.getElementById("startBtn").onclick = () => {
   recordedChunks = [];
 
-  recorder = new MediaRecorder(combinedStream, { mimeType: "video/mpeg" });
+  recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
 
   recorder.ondataavailable = e => {
     if (e.data.size > 0) recordedChunks.push(e.data);
   };
 
   recorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "video/mpeg" });
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
     const url = URL.createObjectURL(blob);
     document.getElementById("preview").src = url;
     audioEl.controls = true;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Recorded Output.webm";
     audioEl.onended = () => {};
   };
 
