@@ -1,7 +1,6 @@
 <h1>Interpret Files</h1>
 <p>This GitHub project allows you to interpret any files you upload, including .BIN, .WAV, .PAK, .PNG, and more! However, beware that the visuals and the audio will be processed for you to look at/listen to, and the visuals and audio will be very erratic and unpredictable (depending on what file you're interpreting). <a style="color: red">MAKE SURE TO DISABLE THE VISUAL INTERPRETATION IF YOU ARE SENSITIVE TO FLASHING LIGHTS!</a> You can see the privacy policy <a href="privacy.html">here</a>.</p>
-<audio id="audioPlay"></audio>
-<button id="audioButton"></button>
+<audio id="audioPlay" controls></audio>
 <input type="file" id="fileInput" multiple>
 <hr>
 <select id="visualType"><option value="a">Waterfall</option><option value="w">Waveform</option><option value="d">Sketch</option></select>
@@ -9,7 +8,7 @@
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer"></canvas><hr>
 <button id="startBtn">Start Recording</button> <button id="stopBtn">Stop Recording</button><br><video id="preview" controls></video>
-<script>const audioPlayer = document.getElementById("audioPlay"), audioButton = document.getElementById("audioButton"), wa = document.getElementById("visualizer"), ddd = document.getElementById("shouldDisplay");
+<script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer"), ddd = document.getElementById("shouldDisplay");
 const s = wa.getContext("2d");
 const options = [...document.querySelectorAll("option")], choice = document.getElementById("visualType"), desc = document.getElementById("description");
 class AudioExporter { // This class is meant for the original programmer's development, not for public use; implement error handling, and handle other bits if invalid types are expected 
@@ -201,10 +200,6 @@ choice.oninput = function() {
     wa.height = 256;
 }
 
-audioButton.onclick = function() {
-	if (audioPlayer.paused) audioPlayer.play(); else audioPlayer.pause();
-}
-
 const canvas = wa;
 const ctx = canvas.getContext("2d");
 const audioEl = audioPlayer;
@@ -248,16 +243,16 @@ document.getElementById("startBtn").onclick = () => {
     const link = document.createElement("a");
     link.href = url;
     link.download = "Recorded Output.webm";
+    link.click();
     audioEl.onended = () => {};
   };
 
   audioEl.play();
-  audioCtx.resume(); // required on some browsers
   recorder.start();
   audioEl.controls = false;
   audioEl.onended = () => recorder.stop();
 };
-
+audioCtx.resume(); // required in some browsers
 document.getElementById("stopBtn").onclick = () => {
   recorder.stop();
 };
