@@ -230,14 +230,14 @@ const combinedStream = new MediaStream([
 document.getElementById("startBtn").onclick = () => {
   recordedChunks = [];
 
-  recorder = new MediaRecorder(combinedStream, { mimeType: "video/mp4" });
+  recorder = new MediaRecorder(combinedStream, { mimeType: "video/mpeg" });
 
   recorder.ondataavailable = e => {
     if (e.data.size > 0) recordedChunks.push(e.data);
   };
 
   recorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "video/mp4" });
+    const blob = new Blob(recordedChunks, { type: "video/mpeg" });
     const url = URL.createObjectURL(blob);
     document.getElementById("preview").src = url;
     audioEl.controls = true;
