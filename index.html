@@ -207,7 +207,7 @@ const audioEl = audioPlayer;
 let recorder;
 let recordedChunks = [];
 
-const canvasStream = canvas.captureStream(30); // video stream
+const canvasStream = canvas.captureStream(60); // video stream
 const audioCtx = new AudioContext();
 
 // Route the <audio> element through Web Audio
@@ -230,7 +230,7 @@ const combinedStream = new MediaStream([
 document.getElementById("startBtn").onclick = () => {
   recordedChunks = [];
 
-  recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
+  recorder = new MediaRecorder(combinedStream, { mimeType: "video/mp4" });
 
   recorder.ondataavailable = e => {
     if (e.data.size > 0) recordedChunks.push(e.data);
@@ -248,7 +248,7 @@ document.getElementById("startBtn").onclick = () => {
   audioCtx.resume(); // required on some browsers
   audioEl.oncanplaythrough = () => recorder.start();
   audioEl.controls = false;
-  audioEl.onended = () => {setTimeout(function() {recorder.stop()}, 100)};
+  audioEl.onended = () => recorder.stop();
 };
 
 document.getElementById("stopBtn").onclick = () => {
