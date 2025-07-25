@@ -182,7 +182,7 @@ s.strokeStyle = "rgb(255,255,255)";
 s.lineWidth = 1;
 s.lineCap = 'round';
 s.lineJoin = 'bevel';
-const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's sample values.", "Uses a white line which isn't fixed"];
+const map = ["Uses 4x4 RGB pixels to directly represent the audio data, where all of the pixels scroll up until the audio ends.", "Uses a white line on a black background to represent the audio data's sample values.", "Uses many white lines attached to each other to represent a cool waveform."];
 for (let i = 0; i < options.length; i++) {
     options[i].onmouseover = function() {
         description.textContent = map[i];
@@ -237,7 +237,7 @@ document.getElementById("startBtn").onclick = () => {
   };
 
   recorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const blob = new Blob(recordedChunks, { type: "video/mp4" });
     const url = URL.createObjectURL(blob);
     document.getElementById("preview").src = url;
     audioEl.controls = true;
@@ -246,9 +246,9 @@ document.getElementById("startBtn").onclick = () => {
 
   audioEl.play();
   audioCtx.resume(); // required on some browsers
-  recorder.start();
+  audioEl.oncanplaythrough = () => recorder.start();
   audioEl.controls = false;
-  audioEl.onended = () => recorder.stop();
+  audioEl.onended = () => {setTimeout(function() {recorder.stop()}, 100)};
 };
 
 document.getElementById("stopBtn").onclick = () => {
