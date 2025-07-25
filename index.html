@@ -252,7 +252,8 @@ document.getElementById("startBtn").onclick = () => {
   audioEl.controls = false;
   audioEl.onended = () => recorder.stop();
 };
-audioCtx.resume(); // required in some browsers
+let s = false;
+document.onclick = function() {if ((s = !s)) audioCtx.resume();} // required in some browsers
 document.getElementById("stopBtn").onclick = () => {
   recorder.stop();
 };
