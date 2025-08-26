@@ -6,7 +6,7 @@
 <select id="visualType"><option value="a">Waterfall</option><option value="w">Waveform</option><option value="d">Sketch</option></select>
 <p id="description"></p>
 Display visualizer? <input id="shouldDisplay" type="checkbox" checked><br>
-CPU mode? <input id="ccc" type="checkbox" checked>
+CPU mode? <input id="ccc" type="checkbox" checked><br>
 <canvas width="256" height="256" id="visualizer"></canvas><hr>
 <button id="startBtn">Start Recording</button> <button id="stopBtn">Stop Recording</button><br><video id="preview" controls></video>
 <script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer"), ddd = document.getElementById("shouldDisplay");
@@ -76,7 +76,7 @@ let size = 256, cache = 0;
 function update() {
 	if (stopUpdating) return;
 	if (!((!ddd.checked || !audioData || audioData.length === 0) || !(shouldRedraw || audioPlayer.currentTime !== point) || !exporter)) {
-if (isCPU.checked && choice.value === "a") {
+	if (isCPU.checked && choice.value === "a") {
 		const size = 256;
 		const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate * exporter.channels / size) * size;
 
@@ -116,7 +116,7 @@ if (isCPU.checked && choice.value === "a") {
   const destination = Math.round(audioPlayer.currentTime * cache) * size;
 	const inc = Math.ceil(cache / fps);
 
-  // Scroll canvas UP by 1px
+  // Scroll canvas UP by Npxs
   s.drawImage(wa, 0, inc, size, size - inc, 0, 0, size, size - inc);
 
   // Create new bottom row
@@ -142,7 +142,7 @@ if (isCPU.checked && choice.value === "a") {
 
   // Draw new row at the bottom
   createImageBitmap(imgData).then(bitmap => {
-    s.drawImage(bitmap, 0, size - 1);
+    s.drawImage(bitmap, 0, size - inc);
   });
 
   prevDestination = destination;
