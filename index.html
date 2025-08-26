@@ -77,14 +77,14 @@ function update(forceRedraw) {
 		const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate * exporter.channels / 64) * 64;
 		const size = 64;
 
-		const imgData = s.getImageData(0, 0, 64, 64);
+		const imgData = s.getImageData(0, 0, 256, 256);
 		const data = imgData.data;
 		console.log(data);
 
 		for (let y = 0; y < size; y++) {
 			for (let x = 0; x < size; x++) {
 				const off = x * 3 + y * size;
-				const z = destination + off;
+				const z = Math.floor((destination + off) / 4);
 				const idx = (y * size + x) * 4; // RGBA in ImageData
 
 				if (z >= audioData.length) {
