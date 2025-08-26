@@ -72,7 +72,7 @@ function update(forceRedraw) {
 	if (!ddd.checked || !audioData || audioData.length === 0 || stopUpdating) return;
 	if (!(shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) return;
 	if (!exporter) return;
-	if (choice.value === "a") {
+/*	if (choice.value === "a") {
 		const size = 256;
 		const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate * exporter.channels / size) * size;
 
@@ -108,7 +108,42 @@ function update(forceRedraw) {
 
 		s.putImageData(imgData, 0, 0);
 		prevDestination = destination;
-	} else if (choice.value === "w") {
+	}*/
+if (choice.value === "a") {
+  const size = 256;
+  const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate * exporter.channels / size) * size;
+
+  // Scroll canvas UP by 1px
+  s.drawImage(wa, 0, 1, size, size - 1, 0, 0, size, size - 1);
+
+  // Create new bottom row
+  const imgData = s.createImageData(size, 1);
+  const row = imgData.data;
+
+  for (let x = 0; x < size; x++) {
+    const z = Math.floor(destination + x * 3);
+    const idx = x * 4;
+
+    if (z >= audioData.length) {
+      row[idx] = 0;
+      row[idx + 1] = 0;
+      row[idx + 2] = 0;
+      row[idx + 3] = 255;
+    } else {
+      row[idx]     = (audioData[z] + bitmax) / divis;
+      row[idx + 1] = (audioData[z + 1] + bitmax) / divis;
+      row[idx + 2] = (audioData[z + 2] + bitmax) / divis;
+      row[idx + 3] = 255;
+    }
+  }
+
+  // Draw new row at the bottom
+  createImageBitmap(imgData).then(bitmap => {
+    s.drawImage(bitmap, 0, size - 1);
+  });
+
+  prevDestination = destination;
+} else if (choice.value === "w") {
 			s.lineWidth = 2;
 			s.fillStyle = "rgb(0,0,0)";
 			s.fillRect(0, 0, 512, 256);
