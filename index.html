@@ -9,7 +9,7 @@ Display visualizer? <input id="shouldDisplay" type="checkbox" checked>
 <canvas width="256" height="256" id="visualizer"></canvas><hr>
 <button id="startBtn">Start Recording</button> <button id="stopBtn">Stop Recording</button><br><video id="preview" controls></video>
 <script>const audioPlayer = document.getElementById("audioPlay"), wa = document.getElementById("visualizer"), ddd = document.getElementById("shouldDisplay");
-const s = wa.getContext("2d");
+let s = wa.getContext("2d");
 const options = [...document.querySelectorAll("option")], choice = document.getElementById("visualType"), desc = document.getElementById("description");
 class AudioExporter { // This class is meant for the original programmer's development, not for public use; implement error handling, and handle other bits if invalid types are expected 
 	constructor(audioData, sampleRate, channels, bits) {
@@ -72,6 +72,7 @@ setInterval(() => s = wa.getContext("2d"), 2000);
 function update(forceRedraw) {
 	//if (ddd.checked || !audioData || audioData.length === 0) return;
 	// //if (!(shouldRedraw || forceRedraw || audioPlayer.currentTime !== point)) return;
+	if (!exporter) return;
 	if (choice.value === "a") {
 		const destination = Math.round(audioPlayer.currentTime * exporter.sampleRate * exporter.channels / 64) * 64;
 		const size = 64;
