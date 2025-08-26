@@ -84,7 +84,7 @@ function update(forceRedraw) {
 			for (let x = 0; x < size; x++) {
 				const off = x * 3 + y * size;
 				const z = Math.floor(destination + off);
-				const idx = Math.floor((y * size + x) / 4) * 4; // RGBA in ImageData
+				const idx = (y * size + x) * 4; // RGBA in ImageData
 
 				if (z >= audioData.length) {
 					data[idx] = 0;
